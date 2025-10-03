@@ -27,7 +27,7 @@ export default function Home() {
 
   const handleUpgrade = () => {
     // Integração com Kiwify - substitua pela URL real do seu produto
-    const kiwifyUrl = "https://kiwify.com.br/checkout/dependencia-emocional-relatorio";
+    const kiwifyUrl = "https://pay.kiwify.com.br/veTb399";
     
     // Adiciona parâmetros para rastreamento e personalização
     const urlWithParams = `${kiwifyUrl}?email=${encodeURIComponent(quizResult?.email || '')}&score=${quizResult?.totalScore || 0}&level=${quizResult?.level || ''}&utm_source=quiz&utm_medium=paywall&utm_campaign=dependencia_emocional`;

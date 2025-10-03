@@ -47,23 +47,49 @@ export default function QuizComponent({ onComplete, onBack }: QuizComponentProps
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
-    const result = calculateScore(answers);
-    const fullResult = {
-      ...result,
-      answers: answers.map((answer, index) => ({
-        questionId: quizQuestions[index].id,
-        answer,
-        score: typeof answer === 'number' ? answer : 1
-      })),
-      email,
-      completedAt: new Date()
-    };
+    try {
+      const result = calculateScore(answers);
+      const fullResult = {
+        ...result,
+        answers: answers.map((answer, index) => ({
+          questionId: quizQuestions[index].id,
+          answer,
+          score: typeof answer === 'number' ? answer : 1
+        })),
+        email,
+        completedAt: new Date()
+      };
 
-    // Salvar no Supabase
-    await saveQuizResult(fullResult);
-    
-    setIsSubmitting(false);
-    onComplete(fullResult);
+      // Salvar no Supabase (com fallback para localStorage)
+      const savedResult = await saveQuizResult(fullResult);
+      
+      if (savedResult) {
+        console.log('Resultado salvo com sucesso');
+      } else {
+        console.warn('Resultado processado mas não foi possível salvar');
+      }
+      
+      setIsSubmitting(false);
+      onComplete(fullResult);
+    } catch (error) {
+      console.error('Erro ao processar quiz:', error);
+      setIsSubmitting(false);
+      
+      // Mesmo com erro, continua o fluxo para não bloquear o usuário
+      const result = calculateScore(answers);
+      const fullResult = {
+        ...result,
+        answers: answers.map((answer, index) => ({
+          questionId: quizQuestions[index].id,
+          answer,
+          score: typeof answer === 'number' ? answer : 1
+        })),
+        email,
+        completedAt: new Date()
+      };
+      
+      onComplete(fullResult);
+    }
   };
 
   const isCurrentAnswered = answers[currentQuestion] !== '' && answers[currentQuestion] !== undefined;
